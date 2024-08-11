@@ -6,43 +6,219 @@
 	padding-bottom: 10px;
 }
 
-.app h1 {
-	padding: 25px;
+header,
+main {
+	padding: 25px 10vw;
+}
+
+h1 {
 	font-size: 2.7rem;
 	font-weight: 300;
 	text-align: center;
-	color: #6b7280;
+	color: #a6afc3;
+	margin-bottom: 16px;
 }
 
-.task, .error {
+input,
+button {
+	appearance: none;
+	border: none;
+	outline: none;
+	background: none;
+}
+
+.newTaskForm {
+	position: relative;
+	display: flex;
+}
+
+.sortBlock {
+	display: flex;
+	justify-content: center;
+	width: 75%;
+	margin: 0 auto;
+}
+
+.newTaskInput,
+.newTaskInput:-webkit-autofill,
+.sortTask,
+.sortTask:-webkit-autofill {
+	flex: 1 1 0%;
 	background-color: #1f2937;
 	border-radius: 16px;
-	padding: 15px;
-	margin: 15px;
+	padding: 16px;
 	color: #eeeeee;
-	font-size: 1.125rem;
+	font-size: 1.25rem;
+	transition:
+		background-color,
+		5000s ease-in-out 0s;
+}
+.newTaskInput {
+	margin-right: 16px;
+}
+.sortTask {
+	margin-left: 25px;
+	width: 100%;
+	min-width: 200px;
+	padding: 9px 16px;
+	font-size: 1.2rem;
+}
+
+.newTaskInput::placeholder,
+.sortTask::placeholder {
+	color: #6b7280;
+	transition: 0.3s;
+}
+.newTaskInput.fillIn::placeholder {
+	color: #dc143c;
+}
+
+.newTaskButton {
+	color: #ec4899;
+	font-size: 1.25rem;
+	font-weight: 700;
+	background-image: linear-gradient(to right, #ec4899, #8b5cf6);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.newTaskButton:hover {
+	opacity: 0.7;
+}
+.newTaskButton:active {
+	opacity: 0.4;
+}
+.newTaskButton:disabled,
+.task_actions button:disabled {
+	background-image: linear-gradient(to right, #ffffff, #6b7280);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	opacity: 0.2;
+}
+.tasksList {
+	list-style: none;
+	margin: 0;
+	padding-inline-start: 0;
+}
+
+.tasksBlock h2 {
+	margin-left: 16px;
+	font-size: 1.7rem;
+	font-weight: 300;
+	color: #a6afc3;
+	margin-bottom: 16px;
+}
+
+.task,
+.error {
+	display: flex;
+	justify-content: space-between;
+	background-color: #111827;
+	padding: 16px;
+	border-radius: 16px;
+	margin-bottom: 15px;
 }
 
 .task:first-letter {
 	text-transform: capitalize;
 }
 
+.task_content {
+	flex: 1 1 0%;
+}
+
+.task_content input {
+	font-size: 1.125rem;
+	color: #eeeeee;
+	width: 100%;
+}
+
+.task_content input::placeholder {
+	color: #eeeeee;
+}
+
+.task_content input:not(:read-only) {
+	color: #ec4899;
+}
+
+.task_actions {
+	display: flex;
+	margin: 0 -8px;
+}
+
+.task_actions button,
+.sortButton {
+	cursor: pointer;
+	margin: 0 8px;
+	font-size: 1.125rem;
+	font-weight: 700;
+	transition: 0.02s;
+}
+
+.task_actions button:hover:not(:disabled) {
+	opacity: 0.7;
+}
+.task_actions button:active:not(:disabled) {
+	opacity: 0.4;
+}
+
+.task_actions .edit,
+.sortButton {
+	background-image: linear-gradient(to right, #ec4899, #8b5cf6);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.sortBlock {
+	padding-top: 32px;
+}
+
+.task_actions .delete {
+	color: #dc143c;
+}
+
 .error {
 	text-align: center;
-	color: #EC4899;
+	color: #ec4899;
+}
+
+.empty {
+	margin-top: 50px;
+	text-align: center;
+	color: #6b7280;
+	animation: spacing 10s infinite;
+	font-size: 1rem;
+}
+
+@keyframes spacing {
+	0% {
+		letter-spacing: normal;
+	}
+	50% {
+		letter-spacing: 3px;
+	}
+	100% {
+		letter-spacing: normal;
+	}
 }
 
 .loader {
 	position: fixed;
 	width: 100px;
 	height: 100px;
-	top: 50%;
+	top: 350px;
 	left: 50%;
 	border: 15px solid #00b006;
 	border-left-color: transparent;
 	border-radius: 50%;
 	background: transparent;
-	transform: translate(-50%, -50%);
+	transform: translateX(-50%);
 	animation:
 		color 4s linear infinite,
 		spiner 1.7s linear infinite;
@@ -58,9 +234,9 @@
 }
 @keyframes spiner {
 	0% {
-		transform: translate(-50%, -50%) rotate(0deg);
+		transform: translateX(-50%) rotate(0deg);
 	}
 	100% {
-		transform: translate(-50%, -50%) rotate(360deg);
+		transform: translateX(-50%) rotate(360deg);
 	}
 }
