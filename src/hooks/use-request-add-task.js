@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { TODOS_URL } from '../constants/todos-url';
+import { ref, push } from 'firebase/database';
+import { db } from '../firebase';
 
 export const useRequestAddTask = (
 	newTaskValue,
 	setNewtaskValue,
 	setIsError,
-	refreshTodoList,
+	setIsTasksSorted,
 ) => {
 	const [isEmpty, setIsEmpty] = useState(false);
 	const [isTaskCreating, setIsTaskCreating] = useState(false);
@@ -22,19 +23,16 @@ export const useRequestAddTask = (
 		}
 		setIsTaskCreating(true);
 
-		fetch(TODOS_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'Application/json; charset=UTF-8',
-			},
-			body: JSON.stringify({ title: newTaskValue.trim() }),
-		})
+		const todosDbRef = ref(db, 'todos');
+		push(todosDbRef, { title: newTaskValue.trim() })
 			.then(() => {
-				refreshTodoList();
 				setNewtaskValue('');
 			})
 			.catch(() => setIsError(true))
-			.finally(() => setIsTaskCreating(false));
+			.finally(() => {
+				setIsTaskCreating(false);
+				setIsTasksSorted(false);
+			});
 	};
 
 	return {

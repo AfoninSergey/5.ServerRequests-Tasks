@@ -1,33 +1,38 @@
-//npm run server
 import { useState, useRef } from 'react';
 import {
 	useRequestGetTasks,
 	useRequestAddTask,
 	useRequestChangeTask,
 	useRequestDeleteTask,
-	useRequestSortingTasks,
+	useSortingTasks,
 } from './hooks';
 import { tascksHandlers } from './handlers/tasksHandlers';
 import { debounceFn } from './utils/debounce';
 import styles from './App.module.css';
 
 export const App = () => {
+	const [todoList, setTodoList] = useState({});
+	const [searchingTodoList, setSearchingTodoList] = useState({});
 	const [newTaskValue, setNewtaskValue] = useState('');
 	const [isError, setIsError] = useState(false);
+	const [isSearchingTodoListFlag, setIsSearchingTodoListFlag] = useState(false);
 	const searchInputRef = useRef(null);
 
 	//user-hooks___________________________________
-	const { todoList, isTasksloading, requestGetTasks, refreshTodoList } =
-		useRequestGetTasks(setIsError);
+	const { isTasksloading, requestGetTasks } = useRequestGetTasks(setTodoList);
+	const { isTasksSorted, sortingTasks, cancelSortingTasks, setIsTasksSorted } =
+		useSortingTasks(todoList, setTodoList, requestGetTasks);
 	const { isEmpty, isTaskCreating, requestAddTask } = useRequestAddTask(
-		newTaskValue, setNewtaskValue, setIsError, refreshTodoList
+		newTaskValue,
+		setNewtaskValue,
+		setIsError,
+		setIsTasksSorted,
 	);
 	const { isTaskChanging, requestChangeTask } = useRequestChangeTask(setIsError);
 	const { isTaskDeleting, requestDeleteTask } = useRequestDeleteTask(
-		setIsError, searchInputRef, refreshTodoList
+		setIsError,
+		searchInputRef,
 	);
-	const { isTasksSorted, requestSortingTasks, requestСancelSortingTasks } =
-		useRequestSortingTasks(requestGetTasks);
 
 	//handlers________________________________
 	const {
@@ -38,7 +43,11 @@ export const App = () => {
 	} = tascksHandlers(setNewtaskValue, requestChangeTask, requestDeleteTask);
 
 	//debounce________________________________
-	const onSearchValueChange = debounceFn(requestGetTasks);
+	const onSearchValueChange = debounceFn(
+		todoList,
+		setSearchingTodoList,
+		setIsSearchingTodoListFlag,
+	);
 
 	return (
 		<div className={styles.app}>
@@ -65,7 +74,7 @@ export const App = () => {
 						<button
 							className={styles.sortButton}
 							type="button"
-							onClick={requestSortingTasks}
+							onClick={sortingTasks}
 						>
 							Сортировать по алфавиту
 						</button>
@@ -73,7 +82,7 @@ export const App = () => {
 						<button
 							className={styles.sortButton}
 							type="button"
-							onClick={requestСancelSortingTasks}
+							onClick={cancelSortingTasks}
 						>
 							Отменить сортировку
 						</button>
@@ -99,11 +108,19 @@ export const App = () => {
 						<div className={styles.error}>
 							Произошла ошибка :(( Перезагрузите страницу!
 						</div>
-					) : todoList.length === 0 ? (
+					) : (Object.keys(todoList).length === 0 &&
+							Object.keys(searchingTodoList).length === 0) ||
+					  (Object.keys(searchingTodoList).length === 0 &&
+							isSearchingTodoListFlag) ? (
 						<div className={styles.empty}>Список задач пуст (((</div>
 					) : (
 						<ul className={styles.tasksList}>
-							{todoList.map(({ id, title }) => (
+							{Object.entries(
+								Object.keys(searchingTodoList).length === 0 &&
+									!isSearchingTodoListFlag
+									? todoList
+									: searchingTodoList,
+							).map(([id, { title }]) => (
 								<li key={id} className={styles.task}>
 									<div className={styles.task_content}>
 										<input

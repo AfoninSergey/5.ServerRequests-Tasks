@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { TODOS_URL } from '../constants/todos-url';
+import { ref, update } from 'firebase/database';
+import { db } from '../firebase';
 
 export const useRequestChangeTask = (setIsError) => {
 	const [isTaskChanging, setIsTaskChanging] = useState(false);
@@ -7,13 +8,9 @@ export const useRequestChangeTask = (setIsError) => {
 	const requestChangeTask = (id, title) => {
 		setIsTaskChanging(true);
 
-		fetch(`${TODOS_URL}/${id}`, {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'Application/json; charset=UTF-8',
-			},
-			body: JSON.stringify({ title }),
-		})
+		const currentTaskDbRef = ref(db, `todos/${id}`);
+
+		update(currentTaskDbRef, { title })
 			.catch(() => setIsError(true))
 			.finally(() => setIsTaskChanging(false));
 	};

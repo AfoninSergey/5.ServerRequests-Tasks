@@ -1,6 +1,4 @@
-import { TODOS_URL } from '../constants/todos-url';
-
-export const debounceFn = (requestGetTasks) => {
+export const debounceFn = (todoList, setSearchingTodoList, isSearchingTodoListFlag) => {
 	function debounce(func, wait) {
 		let timeout;
 		return function () {
@@ -10,9 +8,19 @@ export const debounceFn = (requestGetTasks) => {
 	}
 
 	function onSearchDebounceValueChange(value) {
-		requestGetTasks(`${TODOS_URL}?title_like=${value.trim()}`);
+		if (value.trim().length !== 0) {
+			let searchingTodoList = Object.entries(todoList);
+			isSearchingTodoListFlag(true)
+			searchingTodoList = searchingTodoList.filter((todo) =>
+				todo[1].title.toLowerCase().includes(value.trim().toLowerCase()),
+			);
+			setSearchingTodoList(Object.fromEntries(searchingTodoList));
+		} else {
+			isSearchingTodoListFlag(false)
+			setSearchingTodoList(Object.fromEntries([]))
+		}
 	}
 
-	const onSearchValueChange = debounce(onSearchDebounceValueChange, 1000);
+	const onSearchValueChange = debounce(onSearchDebounceValueChange, 10);
 	return onSearchValueChange;
 };
